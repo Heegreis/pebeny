@@ -1,5 +1,8 @@
 <template>
-  <HelloWorld />
+  <dir class="home">
+    <router-link to="/function-list">Function List</router-link>
+    <HelloWorld />
+  </dir>
 </template>
 
 <script lang="ts">
