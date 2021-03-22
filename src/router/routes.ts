@@ -8,6 +8,10 @@ const routes: RouteConfig[] = [
       { path: '', component: () => import('pages/Index.vue') }
     ]
   },
+  {
+    path: '/vrm',
+    component: () => import('pages/Vrm.vue'),
+  },
 
   // Always leave this as last one,
   // but you can also remove it

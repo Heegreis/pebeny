@@ -28,7 +28,7 @@ app.whenReady().then(() => {
             })
             // open electron debug
             console.log('Opening dev tools')
-            win.webContents.openDevTools()
+            win.webContents.openDevTools({mode:'undocked'})
           })
         }
       })

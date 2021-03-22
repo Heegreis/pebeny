@@ -1,6 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
+      <q-bar class="q-electron-drag"></q-bar>
       <q-toolbar>
         <q-btn
           flat
@@ -25,19 +26,20 @@
       bordered
       content-class="bg-grey-1"
     >
-      <q-list>
-        <q-item-label
-          header
-          class="text-grey-8"
-        >
-          Essential Links
-        </q-item-label>
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
+      <q-scroll-area class="fit">
+        <q-list v-for="(menuItem, index) in menuList" :key="index">
+          <q-item :to="menuItem.to" exact clickable v-ripple target="_blank">
+            <q-item-section avatar>
+              <q-icon :name="menuItem.icon" />
+            </q-item-section>
+            <q-item-section>
+              {{ menuItem.label }}
+            </q-item-section>
+          </q-item>
+
+          <q-separator v-if="menuItem.separator" />
+        </q-list>
+      </q-scroll-area>
     </q-drawer>
 
     <q-page-container>
@@ -92,18 +94,36 @@ const linksData = [
     icon: 'favorite',
     link: 'https://awesome.quasar.dev'
   }
-];
+]
 
-import { defineComponent, ref } from '@vue/composition-api';
+import { defineComponent, ref } from '@vue/composition-api'
 
 export default defineComponent({
   name: 'MainLayout',
   components: { EssentialLink },
   setup() {
-    const leftDrawerOpen = ref(false);
-    const essentialLinks = ref(linksData);
+    const leftDrawerOpen = ref(false)
+    const essentialLinks = ref(linksData)
 
-    return {leftDrawerOpen, essentialLinks}
+    return { leftDrawerOpen, essentialLinks }
+  },
+  data() {
+    return {
+      menuList: [
+        {
+          icon: 'home',
+          label: 'index',
+          to: '/',
+          separator: false
+        },
+        {
+          icon: 'send',
+          label: 'VRM',
+          to: '/vrm',
+          separator: false
+        }
+      ]
+    }
   }
-});
+})
 </script>
