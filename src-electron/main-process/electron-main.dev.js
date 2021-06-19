@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /**
  * This file is used specifically and only for development. It installs
  * `electron-debug` & `vue-devtools`. There shouldn't be any need to
@@ -9,7 +12,7 @@ import electronDebug from 'electron-debug'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import { app, BrowserWindow } from 'electron'
 
-app.whenReady().then(() => {
+void app.whenReady().then(() => {
   // allow for a small delay for mainWindow to be created
   setTimeout(() => {
     // Install `electron-debug` with `devtron`
@@ -17,6 +20,7 @@ app.whenReady().then(() => {
 
     // Install vuejs devtools
     installExtension(VUEJS_DEVTOOLS)
+      // .then((name: string) => {
       .then(name => {
         console.log(`Added Extension: ${name}`)
         // get main window

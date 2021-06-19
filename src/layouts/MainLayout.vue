@@ -100,7 +100,7 @@ import { defineComponent, ref } from '@vue/composition-api'
 
 export default defineComponent({
   name: 'MainLayout',
-  components: { EssentialLink },
+  // components: { EssentialLink },
   setup() {
     const leftDrawerOpen = ref(false)
     const essentialLinks = ref(linksData)
@@ -114,6 +114,12 @@ export default defineComponent({
           icon: 'home',
           label: 'index',
           to: '/',
+          separator: false
+        },
+        {
+          icon: 'send',
+          label: 'Open File',
+          to: '/openfile',
           separator: false
         },
         {

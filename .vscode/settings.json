@@ -71,5 +71,6 @@
     "**/*.vue",
     "**/*.styl"
   ],
-  "workbench.iconTheme": "vscode-icons"
+  "workbench.iconTheme": "vscode-icons",
+  "javascript.validate.enable": false
 }
