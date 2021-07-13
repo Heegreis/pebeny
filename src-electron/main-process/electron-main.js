@@ -85,7 +85,7 @@ function createPebenyWindow () {
 
 function createTray() {
   let appIcon = null
-  appIcon = new Tray('public/icons/favicon-16x16.png')
+  appIcon = new Tray(require('path').resolve(__statics, 'favicon-16x16.png'))
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Open main page', click: () => {
       if (mainWindow === null) {

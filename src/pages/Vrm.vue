@@ -83,10 +83,13 @@ export default Vue.extend({
             console.log(vrm)
             scene.add(vrm.scene)
 
-            vrm.humanoid.getBoneNode(
-              // THREE.VRMSchema.HumanoidBoneName.Hips
-              VRMSchema.HumanoidBoneName.Hips
-            ).rotation.y = Math.PI
+            if (vrm.humanoid) {
+              let hips = vrm.humanoid.getBoneNode(
+                // THREE.VRMSchema.HumanoidBoneName.Hips
+                VRMSchema.HumanoidBoneName.Hips
+              ) as THREE.Object3D
+              hips.rotation.y = Math.PI
+            }
           })
           .catch(error => console.log(error))
       },

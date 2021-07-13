@@ -118,12 +118,6 @@ export default defineComponent({
         },
         {
           icon: 'send',
-          label: 'Open File',
-          to: '/openfile',
-          separator: false
-        },
-        {
-          icon: 'send',
           label: 'VRM',
           to: '/vrm',
           separator: false

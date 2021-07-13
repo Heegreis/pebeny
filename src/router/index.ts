@@ -3,7 +3,6 @@ import VueRouter from 'vue-router';
 import { Store } from 'vuex';
 import { StateInterface } from '../store';
 import routes from './routes';
-import { createWebHashHistory, createWebHistory } from 'vue-router';
 
 /*
  * If not building with SSR mode, you can
