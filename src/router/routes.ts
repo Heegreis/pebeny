@@ -10,6 +10,7 @@ const routes: RouteConfig[] = [
   },
   {
     path: '/vrm',
+    name: 'vrm',
     component: () => import('pages/Vrm.vue'),
   },
 

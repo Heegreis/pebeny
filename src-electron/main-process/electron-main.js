@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint @typescript-eslint/no-var-requires: "off" */
+// 以上因為此檔為一般js，無法使用typescript的語法，倒致找不到可符合eslint的寫法，所以才禁用
 import { app, BrowserWindow, nativeTheme, Menu, Tray, globalShortcut } from 'electron'
 
 try {
@@ -18,8 +21,8 @@ if (process.env.PROD) {
   global.__statics = __dirname
 }
 
-let mainWindow
-let pebenyWindow
+let mainWindow = null
+let pebenyWindow = null
 
 function createWindow () {
   /**
@@ -70,12 +73,10 @@ function createPebenyWindow () {
       // preload: path.resolve(__dirname, 'electron-preload.js')
     }
   })
-  // void pebenyWindow.loadURL(process.env.APP_URL + '/#vrm')
-  if (typeof process.env.APP_URL !=='undefined') {
-    void pebenyWindow.loadURL(process.env.APP_URL + '/#vrm')
-  } else {
-    console.log(new TypeError('process.env.APP_URL is undefined'))
-  }
+  void pebenyWindow.loadURL(process.env.APP_URL)
+  pebenyWindow.webContents.on('did-finish-load', () => {
+    pebenyWindow.webContents.send('vrm')
+  })
   // void pebenyWindow.loadURL(`${String(process.env.APP_URL)}/#vrm`)
 
   pebenyWindow.on('closed', () => {

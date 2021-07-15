@@ -69,7 +69,7 @@ export default Vue.extend({
     loader.crossOrigin = 'anonymous'
     loader.load(
       // URL of the VRM you want to load
-      '/models/896301698663202135.vrm',
+      'models/896301698663202135.vrm',
 
       // called when the resource is loaded
       gltf => {
