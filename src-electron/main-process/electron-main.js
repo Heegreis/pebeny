@@ -21,6 +21,7 @@ if (process.env.PROD) {
   global.__statics = __dirname
 }
 
+let tray = null
 let mainWindow = null
 let pebenyWindow = null
 
@@ -85,8 +86,7 @@ function createPebenyWindow () {
 }
 
 function createTray() {
-  let appIcon = null
-  appIcon = new Tray(require('path').resolve(__statics, 'favicon-16x16.png'))
+  tray = new Tray(require('path').resolve(__statics, 'favicon-16x16.png'))
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Open main page', click: () => {
       if (mainWindow === null) {
@@ -96,11 +96,17 @@ function createTray() {
     }},
     { label: 'Open Pebeny page', click: () => {
       createPebenyWindow()
+    }},
+    { label: 'Exit', click: () => {
+      if (process.platform !== 'darwin') {
+        app.quit()
+      }
     }}
   ])
 
   // Call this again for Linux because we modified the context menu
-  appIcon.setContextMenu(contextMenu)
+  tray.setContextMenu(contextMenu)
+  console.log('Tray!')
 }
 
 app.on('ready', () => {
@@ -108,8 +114,8 @@ app.on('ready', () => {
   globalShortcut.register('F2', () => {
     console.log('Electron loves global shortcuts!')
   })
-  createWindow()
   createTray()
+  createWindow()
 })
 
 app.on('window-all-closed', () => {
