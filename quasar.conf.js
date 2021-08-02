@@ -191,9 +191,18 @@ module.exports = configure(function (/* ctx */) {
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
       nodeIntegration: true,
 
-      extendWebpack (/* cfg */) {
+      extendWebpack (cfg) {
         // do something with Electron main process Webpack cfg
         // chainWebpack also available besides this extendWebpack
+
+        // Add here your webpack customizations
+        cfg.resolve.alias = {
+          ...cfg.resolve.alias, // This adds the existing alias
+
+          // Add your own alias like this
+          'extensions-dev': require('path').resolve(__dirname, 'extensions/'),
+          extensions: require('path').resolve(require('os').homedir(), '.pebeny/extensions/')
+        }
       }
     }
   }

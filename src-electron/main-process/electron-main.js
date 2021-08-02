@@ -1,15 +1,17 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint @typescript-eslint/no-var-requires: "off" */
 // 以上因為此檔為一般js，無法使用typescript的語法，倒致找不到可符合eslint的寫法，所以才禁用
 import { app, BrowserWindow, nativeTheme, Menu, Tray, globalShortcut } from 'electron'
+const fs = require('fs')
+const path = require('path')
 
 try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
-    // import fs = require('fs')
-    // import path = require('path')
-    // fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'))
-    require('fs').unlinkSync(require('path').join(app.getPath('userData'), 'DevTools Extensions'))
+    fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'))
   }
 } catch (_) { }
 
@@ -24,6 +26,30 @@ if (process.env.PROD) {
 let tray = null
 let mainWindow = null
 let pebenyWindow = null
+
+function createTray() {
+  tray = new Tray(path.resolve(__statics, 'favicon-16x16.png'))
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Open main page', click: () => {
+      if (mainWindow === null) {
+        createWindow()
+        console.log(process.env.APP_URL)
+      }
+    }},
+    { label: 'Open Pebeny page', click: () => {
+      createPebenyWindow()
+    }},
+    { label: 'Exit', click: () => {
+      if (process.platform !== 'darwin') {
+        app.quit()
+      }
+    }}
+  ])
+
+  // Call this again for Linux because we modified the context menu
+  tray.setContextMenu(contextMenu)
+  console.log('Tray!')
+}
 
 function createWindow () {
   /**
@@ -85,37 +111,57 @@ function createPebenyWindow () {
   })
 }
 
-function createTray() {
-  tray = new Tray(require('path').resolve(__statics, 'favicon-16x16.png'))
-  const contextMenu = Menu.buildFromTemplate([
-    { label: 'Open main page', click: () => {
-      if (mainWindow === null) {
-        createWindow()
-        console.log(process.env.APP_URL)
-      }
-    }},
-    { label: 'Open Pebeny page', click: () => {
-      createPebenyWindow()
-    }},
-    { label: 'Exit', click: () => {
-      if (process.platform !== 'darwin') {
-        app.quit()
-      }
-    }}
-  ])
+function loadJson(extensions_root_path, extension_name) {
+  const json_path = path.resolve(extensions_root_path, extension_name , 'extension.json')
+  let rawdata = fs.readFileSync(json_path)
+  let json = JSON.parse(rawdata)
+  json['main'] = json['main'].replace(/\.[^/.]+$/, '')
+  return json
+}
 
-  // Call this again for Linux because we modified the context menu
-  tray.setContextMenu(contextMenu)
-  console.log('Tray!')
+let extensions = []
+
+function setExtension() {
+  let extensions_root_path = path.resolve(__dirname, '../../extensions')
+  if (process.env.PROD) {
+    extensions_root_path = path.resolve(require('os').homedir(), '.pebeny/extensions/')
+  }
+  
+  const isDirectory = fileName => {
+    return fs.lstatSync(fileName).isDirectory()
+  }
+
+  const extension_names = fs.readdirSync(extensions_root_path).map(fileName => {
+    return path.join(extensions_root_path, fileName)
+  }).filter(isDirectory).map(dirpath => {
+    return path.basename(dirpath)
+  })
+  
+  console.log(extension_names)
+  
+  extension_names.forEach(extension_name => {
+    let extension = loadJson(extensions_root_path, extension_name)
+    const module = require(`extensions-dev/${extension_name}/${extension['main']}`)
+    extension['activate'] = module.activate
+    // extension['activate']()
+    extensions.push(extension)
+  })
 }
 
 app.on('ready', () => {
   console.log('Electron!')
-  globalShortcut.register('F2', () => {
-    console.log('Electron loves global shortcuts!')
-  })
+  setExtension()
+  // globalShortcut.register('F2', () => {
+  //   console.log('Electron loves global shortcuts!')
+  // })
   createTray()
   createWindow()
+
+  extensions.forEach(extension => {
+    if (extension['activationEvents'].includes('start')) {
+      extension['activate']()
+    }
+  })
 })
 
 app.on('window-all-closed', () => {
