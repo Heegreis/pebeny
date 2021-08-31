@@ -8,6 +8,7 @@
 import { app, BrowserWindow, nativeTheme, Menu, Tray, globalShortcut } from 'electron'
 const fs = require('fs')
 const path = require('path')
+import { Pebeny } from '../utils/pebeny'
 
 try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -26,6 +27,8 @@ if (process.env.PROD) {
 let tray = null
 let mainWindow = null
 let pebenyWindow = null
+
+const pebeny = new Pebeny()
 
 function createTray() {
   tray = new Tray(path.resolve(__statics, 'favicon-16x16.png'))
@@ -111,57 +114,23 @@ function createPebenyWindow () {
   })
 }
 
-function loadJson(extensions_root_path, extension_name) {
-  const json_path = path.resolve(extensions_root_path, extension_name , 'extension.json')
-  let rawdata = fs.readFileSync(json_path)
-  let json = JSON.parse(rawdata)
-  json['main'] = json['main'].replace(/\.[^/.]+$/, '')
-  return json
-}
-
-let extensions = []
-
-function setExtension() {
-  let extensions_root_path = path.resolve(__dirname, '../../extensions')
-  if (process.env.PROD) {
-    extensions_root_path = path.resolve(require('os').homedir(), '.pebeny/extensions/')
-  }
-  
-  const isDirectory = fileName => {
-    return fs.lstatSync(fileName).isDirectory()
-  }
-
-  const extension_names = fs.readdirSync(extensions_root_path).map(fileName => {
-    return path.join(extensions_root_path, fileName)
-  }).filter(isDirectory).map(dirpath => {
-    return path.basename(dirpath)
-  })
-  
-  console.log(extension_names)
-  
-  extension_names.forEach(extension_name => {
-    let extension = loadJson(extensions_root_path, extension_name)
-    const module = require(`extensions-dev/${extension_name}/${extension['main']}`)
-    extension['activate'] = module.activate
-    // extension['activate']()
-    extensions.push(extension)
-  })
-}
-
 app.on('ready', () => {
   console.log('Electron!')
-  setExtension()
+  pebeny.setExtension()
   // globalShortcut.register('F2', () => {
   //   console.log('Electron loves global shortcuts!')
   // })
   createTray()
   createWindow()
 
-  extensions.forEach(extension => {
+  Object.entries(pebeny.extensions).forEach(([extension_id, extension]) => {
     if (extension['activationEvents'].includes('start')) {
-      extension['activate']()
+      pebeny.startFork(extension)
     }
   })
+
+  pebeny.executeCommand('extension.helloWorld')
+  pebeny.executeCommand('extension.helloWorld.dosome')
 })
 
 app.on('window-all-closed', () => {

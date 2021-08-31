@@ -1,0 +1,15 @@
+{
+    "name": "helloworld-sample",
+    "displayName": "helloworld-sample",
+    "description": "HelloWorld example for VS Code",
+    "version": "0.0.1",
+    "publisher": "vscode-samples",
+    "repository": "https://github.com/microsoft/vscode-extension-samples/helloworld-sample",
+    "engines": {
+        "vscode": "^1.51.0"
+    },
+    "activationEvents": [
+        "start"
+    ],
+    "main": "main.js"
+}

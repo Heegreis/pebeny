@@ -1,0 +1,23 @@
+{
+    "name": "helloworld-sample",
+    "displayName": "helloworld-sample",
+    "description": "HelloWorld example for VS Code",
+    "version": "0.0.1",
+    "publisher": "vscode-samples",
+    "repository": "https://github.com/microsoft/vscode-extension-samples/helloworld-sample",
+    "engines": {
+        "vscode": "^1.51.0"
+    },
+    "activationEvents": [
+        "onCommand:extension.helloWorld"
+    ],
+    "main": "main.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.helloWorld",
+                "title": "Hello World"
+            }
+        ]
+    }
+}
