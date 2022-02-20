@@ -1,7 +1,6 @@
 # Pebeny (pebeny)
 
 A Quasar Framework app
-A PC personal assistant
 
 ## Install the dependencies
 
@@ -18,7 +17,13 @@ quasar dev
 ### Lint the files
 
 ```bash
-yarn run lint
+yarn lint
+```
+
+### Format the files
+
+```bash
+yarn format
 ```
 
 ### Build the app for production
@@ -30,11 +35,3 @@ quasar build
 ### Customize the configuration
 
 See [Configuring quasar.conf.js](https://quasar.dev/quasar-cli/quasar-conf-js).
-
-## 筆記
-
-暫時將以下資料移到個人的 projects/pebeny 暫存資料:  
-src/pages/Vrm*.vue  
-src/pages/gltf.vue  
-public/models/* 內目前沒用到的模型  
-public/animations

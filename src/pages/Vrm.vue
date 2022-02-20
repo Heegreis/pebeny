@@ -1,125 +1,105 @@
 <template>
-  <div>
-    <div ref="dragBar" class="q-electron-drag bg-primary">123</div>
-    <div ref="renderDiv"></div>
-  </div>
+  <div ref="dragBar" class="q-electron-drag bg-primary">dragBar</div>
+  <div ref="renderDiv"></div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import * as THREE from 'three'
-// import {WebGLRenderer} from 'three'
-// import GLTFLoader from 'three/examples/jsm/loaders/GLTFLoader'
-// import OrbitControls from 'three/examples/jsm/controls/OrbitControls'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { VRM, VRMSchema, VRMUtils } from '@pixiv/three-vrm'
+import { defineComponent, ref, onMounted, Ref } from 'vue';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { loadModel } from 'components/pixivThreeVRM';
 
-export default Vue.extend({
-  name: 'Vrm',
-  // created: function() {
-  //   // <HTMLElement>this.$refs.renderDiv
-  //   // this.renderDiv = this.$refs.renderDiv as HTMLElement
-  // },
-  mounted: function() {
-    const dragBarHeight: number = (this.$refs.dragBar as HTMLElement)
-      .offsetHeight
-    // const dragBarHeight = this.$refs.dragBar.offsetHeight
+function setDragBar() {
+  const dragBar = ref();
+  const dragBarHeight = ref(0);
+  // let dragBarHeight = 0;
+  onMounted(() => {
+    dragBarHeight.value = (dragBar.value as HTMLElement).offsetHeight;
+  });
+  return { dragBar, dragBarHeight };
+}
+
+function setThreejs(dragBarHeight: Ref) {
+  const renderDiv = ref();
+
+  onMounted(() => {
     // renderer
     const renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer({
-      alpha: true
-    })
-    renderer.setSize(window.innerWidth, window.innerHeight - dragBarHeight)
-    renderer.setClearColor(0x000000, 0) // the default
-    renderer.setPixelRatio(window.devicePixelRatio)
-    // document.body.appendChild(renderer.domElement)
-    // this.$refs.renderDiv.appendChild(renderer.domElement)
-    let renderDiv = this.$refs.renderDiv as HTMLElement
-    renderDiv.appendChild(renderer.domElement)
+      alpha: true, // 是否可以設定背景色透明
+      antialias: true, // 反鋸齒
+    });
+    renderer.setSize(
+      window.innerWidth,
+      window.innerHeight - dragBarHeight.value
+    );
+    renderer.setClearColor(0x000000, 0); // the default
+    renderer.setPixelRatio(window.devicePixelRatio);
+    (renderDiv.value as HTMLElement).appendChild(renderer.domElement);
 
     // camera
     const camera = new THREE.PerspectiveCamera(
       30.0,
-      window.innerWidth / (window.innerHeight - dragBarHeight),
+      window.innerWidth / (window.innerHeight - dragBarHeight.value),
       // window.innerWidth / window.innerHeight,
       0.1,
       20.0
-    )
-    camera.position.set(0.0, 1.0, 5.0)
+    );
+    camera.position.set(0.0, 1.0, 5.0);
 
     // camera controls
     const controls: OrbitControls = new OrbitControls(
       camera,
       renderer.domElement
-    )
-    controls.screenSpacePanning = true
-    controls.target.set(0.0, 1.0, 0.0)
-    controls.update()
+    );
+    controls.screenSpacePanning = true;
+    controls.target.set(0.0, 1.0, 0.0);
+    controls.update();
 
     // scene
-    const scene = new THREE.Scene()
+    const scene = new THREE.Scene();
 
     // light
-    const light = new THREE.DirectionalLight(0xffffff)
-    light.position.set(1.0, 1.0, 1.0).normalize()
-    scene.add(light)
+    const light = new THREE.DirectionalLight(0xffffff);
+    light.position.set(1.0, 1.0, 1.0).normalize();
+    scene.add(light);
 
-    // gltf and vrm
-    const loader: GLTFLoader = new GLTFLoader()
-    loader.crossOrigin = 'anonymous'
-    loader.load(
-      // URL of the VRM you want to load
-      'models/896301698663202135.vrm',
-
-      // called when the resource is loaded
-      gltf => {
-        // calling this function greatly improves the performance
-        // VRMUtils.VRMUtils.removeUnnecessaryJoints(gltf.scene)
-        VRMUtils.removeUnnecessaryJoints(gltf.scene)
-
-        // generate VRM instance from gltf
-        VRM.from(gltf)
-          .then(vrm => {
-            console.log(vrm)
-            scene.add(vrm.scene)
-
-            if (vrm.humanoid) {
-              let hips = vrm.humanoid.getBoneNode(
-                // THREE.VRMSchema.HumanoidBoneName.Hips
-                VRMSchema.HumanoidBoneName.Hips
-              ) as THREE.Object3D
-              hips.rotation.y = Math.PI
-            }
-          })
-          .catch(error => console.log(error))
-      },
-
-      // called while loading is progressing
-      progress =>
-        console.log(
-          'Loading model...',
-          100.0 * (progress.loaded / progress.total),
-          '%'
-        ),
-
-      // called when loading has errors
-      error => console.error(error)
-    )
+    // midel
+    const modelPath = 'models/896301698663202135.vrm';
+    // const modelPath = 'models/AliciaSolid_vrm-0.51.vrm';
+    loadModel(scene, modelPath);
 
     // helpers
-    const gridHelper = new THREE.GridHelper(10, 10)
-    scene.add(gridHelper)
+    const gridHelper = new THREE.GridHelper(10, 10);
+    scene.add(gridHelper);
 
-    const axesHelper = new THREE.AxesHelper(5)
-    scene.add(axesHelper)
+    const axesHelper = new THREE.AxesHelper(5);
+    scene.add(axesHelper);
 
     function animate() {
-      requestAnimationFrame(animate)
+      requestAnimationFrame(animate);
 
-      renderer.render(scene, camera)
+      renderer.render(scene, camera);
     }
 
-    animate()
-  }
-})
+    animate();
+  });
+
+  return {
+    renderDiv,
+  };
+}
+
+export default defineComponent({
+  name: 'Vrm',
+  setup() {
+    const { dragBar, dragBarHeight } = setDragBar();
+
+    const { renderDiv } = setThreejs(dragBarHeight);
+
+    return {
+      dragBar,
+      renderDiv,
+    };
+  },
+});
 </script>

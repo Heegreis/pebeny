@@ -10,46 +10,61 @@
 </template>
 
 <script lang="ts">
-import { Todo, Meta } from 'components/models'
-import ExampleComponent from 'components/CompositionComponent.vue'
-import { defineComponent, ref } from '@vue/composition-api'
-import { ipcRenderer } from 'electron'
+import { Todo, Meta } from 'components/models';
+import ExampleComponent from 'components/CompositionComponent.vue';
+import { defineComponent, ref, onMounted } from 'vue';
+// import { ipcRenderer } from 'electron';
+import { useRouter } from 'vue-router';
+
+function setPageRedirectForElectron() {
+  onMounted(() => {
+    const $router = useRouter();
+
+    window.electronAPI
+      .goVRM()
+      .then(() => {
+        $router.push({ path: 'vrm' }).catch((error) => {
+          console.log(error);
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  });
+}
 
 export default defineComponent({
   name: 'PageIndex',
   components: { ExampleComponent },
   setup() {
+    setPageRedirectForElectron();
+
     const todos = ref<Todo[]>([
       {
         id: 1,
-        content: 'ct1'
+        content: 'ct1',
       },
       {
         id: 2,
-        content: 'ct2'
+        content: 'ct2',
       },
       {
         id: 3,
-        content: 'ct3'
+        content: 'ct3',
       },
       {
         id: 4,
-        content: 'ct4'
+        content: 'ct4',
       },
       {
         id: 5,
-        content: 'ct5'
-      }
-    ])
+        content: 'ct5',
+      },
+    ]);
     const meta = ref<Meta>({
-      totalCount: 1200
-    })
-    return { todos, meta }
+      totalCount: 1200,
+    });
+    return { todos, meta };
   },
-  mounted() {
-    ipcRenderer.on('vrm', event => {
-      void this.$router.push({ name: 'vrm' })
-    })
-  }
-})
+});
 </script>
